@@ -1,6 +1,6 @@
-
+import axios from "axios";
 import "../assets/css/Contact.css";
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import {
   Row,
   Col,
@@ -27,67 +27,20 @@ import {
 } from "react-icons/fa";
 
 
-const messagesData = [
-  {
-    id: 1,
-    name: "Rahul Sharma",
-    email: "rahul@gmail.com",
-    phone: "+91 98765 43210",
-    subject: "Donation Enquiry",
-    category: "Donation",
-    message:
-      "Hello, I would like to know more about your donation programs and how I can contribute to your foundation.",
-    date: "29 July 2026",
-    time: "10:42 AM",
-  },
-  {
-    id: 2,
-    name: "Priya Patil",
-    email: "priya@gmail.com",
-    phone: "+91 91234 56789",
-    subject: "Volunteer Programme",
-    category: "Volunteer",
-    message:
-      "I am interested in volunteering with your organization. Please let me know about the upcoming volunteer activities.",
-    date: "28 July 2026",
-    time: "04:15 PM",
-  },
-  {
-    id: 3,
-    name: "Amit Joshi",
-    email: "amit@gmail.com",
-    phone: "+91 99887 76655",
-    subject: "Education Programme",
-    category: "Programme",
-    message:
-      "I want to know more about the education initiatives conducted by your foundation for underprivileged children.",
-    date: "27 July 2026",
-    time: "11:20 AM",
-  },
-  {
-    id: 4,
-    name: "Sneha Deshmukh",
-    email: "sneha@gmail.com",
-    phone: "+91 98761 23456",
-    subject: "General Enquiry",
-    category: "General",
-    message:
-      "I would like to learn more about the work your organization is doing in the local community.",
-    date: "26 July 2026",
-    time: "09:35 AM",
-  },
-];
 
-const getInitials = (name) =>
-  name
-    .split(" ")
-    .map((word) => word[0])
+
+const getInitials = (Name = "") => {
+  if (!Name) return "?";
+
+  return Name.split(" ")
+    .map(word => word[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
-
+};
 function Contact() {
-  const [messages, setMessages] = useState(messagesData);
+  const [messages, setMessages] = useState([]);
+ const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [selectedMessage, setSelectedMessage] = useState(null);
@@ -100,27 +53,50 @@ function Contact() {
     "Programme",
     "General",
   ];
+  const getMessages = async () => {
+  try {
+    const response = await axios.get("http://localhost:8000/getContact");
 
-  const filteredMessages = messages.filter((message) => {
-    const searchMatch =
-      message.name.toLowerCase().includes(search.toLowerCase()) ||
-      message.email.toLowerCase().includes(search.toLowerCase()) ||
-      message.subject.toLowerCase().includes(search.toLowerCase());
+    setMessages(response.data);
 
-    const categoryMatch =
-      category === "All" || message.category === category;
+  } catch (error) {
+    console.log(error);
+    alert("Unable to fetch messages.");
+  }
+};
+useEffect(() => {
+  getMessages();
+}, []);
 
-    return searchMatch && categoryMatch;
-  });
+ const filteredMessages = messages.filter((message) => {
+  const searchText = search.toLowerCase();
 
-  const deleteMessage = () => {
+  return (
+    (message.Name || "").toLowerCase().includes(searchText) ||
+    (message.Email || "").toLowerCase().includes(searchText) ||
+    (message.Subject || "").toLowerCase().includes(searchText)
+  );
+});
+
+  const deleteMessage = async () => {
+  try {
+    await axios.delete(
+      `http://localhost:8000/deleteContact/${deleteId}`
+    );
+
     setMessages((prev) =>
-      prev.filter((item) => item.id !== deleteId)
+      prev.filter((item) => item._id !== deleteId)
     );
 
     setDeleteId(null);
     setSelectedMessage(null);
-  };
+
+    alert("Message deleted successfully.");
+  } catch (error) {
+    console.log(error);
+    alert("Unable to delete message.");
+  }
+};
 
   return (
     <div className="contact-page">
@@ -276,12 +252,11 @@ function Contact() {
 
             <Form.Control
               placeholder="Search messages..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              
             />
 
             {search && (
-              <button onClick={() => setSearch("")}>
+              <button >
                 <FaTimes />
               </button>
             )}
@@ -329,13 +304,13 @@ function Contact() {
 
               <div
                 className="message-card"
-                key={message.id}
+                key={message._id}
               >
 
                 <div className="message-left">
 
                   <div className="sender-avatar">
-                    {getInitials(message.name)}
+                    {getInitials(message.Name)}
                   </div>
 
                   <div className="message-content">
@@ -343,8 +318,8 @@ function Contact() {
                     <div className="sender-row">
 
                       <div>
-                        <h5>{message.name}</h5>
-                        <span>{message.email}</span>
+                        <h5>{message.Name}</h5>
+                        <span>{message.Email}</span>
                       </div>
 
                       <Badge className="category-badge">
@@ -353,22 +328,10 @@ function Contact() {
 
                     </div>
 
-                    <h4>{message.subject}</h4>
+                    <h4>{message.Subject}</h4>
 
-                    <p>{message.message}</p>
+                    <p>{message.Message}</p>
 
-                    <div className="message-meta">
-
-                      <span>
-                        <FaCalendarAlt />
-                        {message.date}
-                      </span>
-
-                      <span>
-                        {message.time}
-                      </span>
-
-                    </div>
 
                   </div>
 
@@ -391,7 +354,7 @@ function Contact() {
                   <Button
                     className="delete-message"
                     onClick={() =>
-                      setDeleteId(message.id)
+                      setDeleteId(message._id)
                     }
                   >
                     <FaTrashAlt />
@@ -446,7 +409,7 @@ function Contact() {
                 </span>
 
                 <Modal.Title>
-                  {selectedMessage.subject}
+                  {selectedMessage.Subject}
                 </Modal.Title>
               </div>
             </Modal.Header>
@@ -457,12 +420,12 @@ function Contact() {
               <div className="modal-sender">
 
                 <div className="modal-avatar">
-                  {getInitials(selectedMessage.name)}
+                  {getInitials(selectedMessage.Name)}
                 </div>
 
                 <div>
-                  <h5>{selectedMessage.name}</h5>
-                  <span>{selectedMessage.email}</span>
+                  <h5>{selectedMessage.Name}</h5>
+                  <span>{selectedMessage.Email}</span>
                 </div>
 
               </div>
@@ -472,18 +435,15 @@ function Contact() {
 
                 <span>
                   <FaEnvelope />
-                  {selectedMessage.email}
+                  {selectedMessage.Email}
                 </span>
 
                 <span>
                   <FaPhoneAlt />
-                  {selectedMessage.phone}
+                  {selectedMessage.Phone}
                 </span>
 
-                <span>
-                  <FaCalendarAlt />
-                  {selectedMessage.date}
-                </span>
+               
 
               </div>
 
@@ -515,7 +475,7 @@ function Contact() {
               <Button
                 className="delete-modal"
                 onClick={() =>
-                  setDeleteId(selectedMessage.id)
+                  setDeleteId(selectedMessage._id)
                 }
               >
                 <FaTrashAlt />
@@ -555,7 +515,7 @@ function Contact() {
           <div className="delete-confirm-actions">
 
             <Button
-              onClick={() => setDeleteId(null)}
+              onClick={() => setDeleteId(_id)}
               className="cancel-delete"
             >
               Cancel
