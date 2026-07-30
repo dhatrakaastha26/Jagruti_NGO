@@ -33,7 +33,7 @@ function Sidebar({ collapsed, setCollapsed }) {
       label: "Blogs",
     },
     {
-      path: "/orders",
+      path:"/donation",
       icon: <FaHandHoldingHeart />,
       label: "Donations",
     },

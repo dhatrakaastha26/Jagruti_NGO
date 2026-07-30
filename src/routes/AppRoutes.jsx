@@ -5,7 +5,7 @@ import Blog from "../pages/Blog";
 import Donation from "../pages/Donation";
 import Gallery from "../pages/Gallery";
 import Contact from "../pages/Contact";
-import Login from "../pages/Login";
+import Settings from "../pages/Settings";
 import NotFound from "../pages/NotFound";
 import Programs from "../pages/Program";
 
@@ -25,7 +25,7 @@ function AppRoutes() {
 
         <Route path="/contact" element={<Contact />} />
 
-        <Route path="/login" element={<Login />} />
+        <Route path="/settings" element={<Settings/>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>
