@@ -209,15 +209,7 @@ function Topbar() {
               <FaBars size={20} />
             </button>
 
-            {/* Search */}
-            <Form className="topbar-search">
-              <FaSearch className="search-icon" />
-
-              <Form.Control
-                type="search"
-                placeholder="Search programs, blogs, donations..."
-              />
-            </Form>
+            
 
             {/* Right Actions */}
             <div className="d-flex align-items-center gap-2 ms-auto">

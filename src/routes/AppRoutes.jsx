@@ -6,12 +6,12 @@ import Donation from "../pages/Donation";
 import Gallery from "../pages/Gallery";
 import Contact from "../pages/Contact";
 import Settings from "../pages/Settings";
-import NotFound from "../pages/NotFound";
 import Programs from "../pages/Program";
 
 function AppRoutes() {
   return (
     <BrowserRouter>
+    
       <Routes>
         <Route path="/" element={<Dashboard />} />
 
@@ -27,7 +27,6 @@ function AppRoutes() {
 
         <Route path="/settings" element={<Settings/>} />
 
-        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

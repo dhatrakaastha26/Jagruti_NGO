@@ -1,14 +1,14 @@
-// import AdminLayout from "../layouts/AdminLayout";
 import React, { useMemo, useState } from "react";
 import {
-  Container, Row, Col, Card, Button, Modal, Form,
-  InputGroup, Badge
+  Container, Row, Col, Button, Modal, Form,
+  InputGroup, Table
 } from "react-bootstrap";
 import {
   FaPlus, FaSearch, FaFilter, FaEye, FaEdit, FaTrash,
-  FaBlog, FaCheckCircle, FaFileAlt, FaLayerGroup,
-  FaCalendarAlt, FaUser, FaArrowLeft, FaGlobe
+  FaBlog, FaCalendarAlt
 } from "react-icons/fa";
+import "../assets/css/Blog.css";
+import AdminLayout from "../layouts/AdminLayout";
 
 const categories = [
   "Education",
@@ -23,76 +23,51 @@ const initialBlogs = [
     id: 1,
     title: "Empowering Children Through Education",
     category: "Education",
-    description:
-      "Discover how our education initiatives are helping children build a brighter and more confident future.",
-    content:
-      "Education is one of the most powerful tools for creating positive change in society. Through our initiatives, we aim to provide children with the resources and opportunities they need to succeed.",
-    author: "Admin",
+    description: "Discover how our education initiatives are helping children build a brighter and more confident future.",
+    content: "Education is one of the most powerful tools for creating positive change in society. Through our initiatives, we aim to provide children with the resources and opportunities they need to succeed.",
     date: "15 July 2026",
-    status: "Published",
     published: true,
-    image:
-      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=900"
+    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=900"
   },
   {
     id: 2,
     title: "Building Stronger Women Leaders",
     category: "Women Empowerment",
-    description:
-      "Our women empowerment programs focus on skills, confidence and financial independence.",
-    content:
-      "Empowering women creates stronger families and communities. Our skill development initiatives help women discover new opportunities.",
-    author: "Admin",
+    description: "Our women empowerment programs focus on skills, confidence and financial independence.",
+    content: "Empowering women creates stronger families and communities. Our skill development initiatives help women discover new opportunities.",
     date: "10 July 2026",
-    status: "Published",
     published: true,
-    image:
-      "https://images.unsplash.com/photo-1573496799515-eebbb63814f2?w=900"
+    image: "https://images.unsplash.com/photo-1573496799515-eebbb63814f2?w=900"
   },
   {
     id: 3,
     title: "Community Health Awareness Camp",
     category: "Healthcare",
-    description:
-      "A look at our recent health awareness campaign and its impact on the local community.",
-    content:
-      "Healthcare awareness plays an important role in building healthier communities. Our health camps provide valuable information and support.",
-    author: "Admin",
+    description: "A look at our recent health awareness campaign and its impact on the local community.",
+    content: "Healthcare awareness plays an important role in building healthier communities. Our health camps provide valuable information and support.",
     date: "05 July 2026",
-    status: "Published",
     published: true,
-    image:
-      "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=900"
+    image: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=900"
   },
   {
     id: 4,
     title: "Together for a Greener Tomorrow",
     category: "Environment",
-    description:
-      "Learn how our environmental initiatives encourage communities to protect nature.",
-    content:
-      "Environmental conservation is everyone's responsibility. Our plantation and awareness drives encourage people to take meaningful action.",
-    author: "Admin",
+    description: "Learn how our environmental initiatives encourage communities to protect nature.",
+    content: "Environmental conservation is everyone's responsibility. Our plantation and awareness drives encourage people to take meaningful action.",
     date: "28 June 2026",
-    status: "Draft",
     published: false,
-    image:
-      "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?w=900"
+    image: "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?w=900"
   },
   {
     id: 5,
     title: "Creating Stronger Communities Together",
     category: "Community Development",
-    description:
-      "How community participation and collaboration can create lasting positive change.",
-    content:
-      "Strong communities are built when people come together and support one another. Our initiatives focus on creating sustainable community development.",
-    author: "Admin",
+    description: "How community participation and collaboration can create lasting positive change.",
+    content: "Strong communities are built when people come together and support one another. Our initiatives focus on creating sustainable community development.",
     date: "20 June 2026",
-    status: "Published",
     published: true,
-    image:
-      "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=900"
+    image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=900"
   }
 ];
 
@@ -101,9 +76,7 @@ const emptyBlog = {
   category: "Education",
   description: "",
   content: "",
-  author: "Admin",
   date: "",
-  status: "Draft",
   published: false,
   image: ""
 };
@@ -115,33 +88,34 @@ const Blog = () => {
   const [modal, setModal] = useState("");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
-  const [status, setStatus] = useState("All");
-
-  const stats = [
-    [FaBlog, blogs.length, "Total Blogs", "navy"],
-    [FaCheckCircle, blogs.filter(b => b.status === "Published").length, "Published", "red"],
-    [FaFileAlt, blogs.filter(b => b.status === "Draft").length, "Drafts", "navy"],
-    [FaLayerGroup, new Set(blogs.map(b => b.category)).size, "Categories", "red"]
-  ];
 
   const filteredBlogs = useMemo(
     () =>
       blogs.filter(
         b =>
           b.title.toLowerCase().includes(search.toLowerCase()) &&
-          (category === "All" || b.category === category) &&
-          (status === "All" || b.status === status)
+          (category === "All" || b.category === category)
       ),
-    [blogs, search, category, status]
+    [blogs, search, category]
   );
 
   const updateForm = e => {
     const { name, value, type, checked } = e.target;
-
     setForm({
       ...form,
       [name]: type === "checkbox" ? checked : value
     });
+  };
+
+  const handleImageUpload = e => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setForm(prev => ({ ...prev, image: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const openAdd = () => {
@@ -158,16 +132,11 @@ const Blog = () => {
   const saveBlog = e => {
     e.preventDefault();
 
-    const blogData = {
-      ...form,
-      status: form.published ? "Published" : "Draft"
-    };
-
     if (modal === "add") {
       setBlogs([
         ...blogs,
         {
-          ...blogData,
+          ...form,
           id: Date.now(),
           image:
             form.image ||
@@ -176,9 +145,7 @@ const Blog = () => {
       ]);
     } else {
       setBlogs(
-        blogs.map(b =>
-          b.id === selected.id ? { ...b, ...blogData } : b
-        )
+        blogs.map(b => (b.id === selected.id ? { ...b, ...form } : b))
       );
     }
 
@@ -193,341 +160,40 @@ const Blog = () => {
   };
 
   return (
-    <>
-      <style>{`
-        :root{
-          --navy:#0B2C6B;
-          --dark:#031436;
-          --red:#E53935;
-          --light-red:#FFF1F0;
-          --light-navy:#EEF3FA;
-          --bg:#F7F8FC;
-          --text:#172033;
-          --muted:#64748B;
-          --border:#E5EAF1;
-        }
-
-        .blog-page{
-          min-height:100vh;
-          background:var(--bg);
-          padding:30px;
-        }
-
-        .blog-hero{
-          background:linear-gradient(135deg,var(--dark),var(--navy));
-          color:white;
-          border-radius:20px;
-          padding:32px;
-          margin-bottom:25px;
-        }
-
-        .hero-label{
-          color:#FCA5A5;
-          font-size:10px;
-          font-weight:800;
-          letter-spacing:2px;
-        }
-
-        .blog-hero h1{
-          font-size:30px;
-          font-weight:800;
-          margin:6px 0;
-        }
-
-        .blog-hero p{
-          color:#D7E0EF;
-          font-size:13px;
-          margin:0;
-        }
-
-        .primary-btn,
-        .primary-btn:hover{
-          background:var(--red);
-          border-color:var(--red);
-          font-size:11px;
-          font-weight:700;
-        }
-
-        .primary-btn:hover{
-          background:var(--dark);
-          border-color:var(--dark);
-        }
-
-        .stat-card{
-          border:1px solid var(--border);
-          border-radius:16px;
-          transition:.3s;
-        }
-
-        .stat-card:hover,
-        .blog-card:hover{
-          transform:translateY(-5px);
-          box-shadow:0 15px 30px #03143612;
-        }
-
-        .stat-icon{
-          width:44px;
-          height:44px;
-          display:grid;
-          place-items:center;
-          border-radius:12px;
-        }
-
-        .navy-icon{
-          background:var(--light-navy);
-          color:var(--navy);
-        }
-
-        .red-icon{
-          background:var(--light-red);
-          color:var(--red);
-        }
-
-        .stat-number{
-          color:var(--dark);
-          font-size:21px;
-          font-weight:800;
-        }
-
-        .stat-label,
-        .blog-meta{
-          color:var(--muted);
-          font-size:11px;
-        }
-
-        .section-title{
-          color:var(--dark);
-          font-size:22px;
-          font-weight:800;
-          margin:35px 0 5px;
-        }
-
-        .filter-box{
-          background:white;
-          border:1px solid var(--border);
-          border-radius:16px;
-          padding:15px;
-          margin:22px 0;
-        }
-
-        .filter-control{
-          font-size:12px;
-          box-shadow:none!important;
-        }
-
-        .blog-card{
-          height:100%;
-          overflow:hidden;
-          border:1px solid var(--border);
-          border-radius:16px;
-          transition:.3s;
-        }
-
-        .blog-image{
-          height:200px;
-          position:relative;
-          overflow:hidden;
-        }
-
-        .blog-image img{
-          width:100%;
-          height:100%;
-          object-fit:cover;
-          transition:.5s;
-        }
-
-        .blog-card:hover .blog-image img{
-          transform:scale(1.07);
-        }
-
-        .category-badge{
-          position:absolute;
-          left:14px;
-          top:14px;
-          background:var(--red);
-          color:white;
-          padding:6px 11px;
-          border-radius:20px;
-          font-size:9px;
-          font-weight:700;
-        }
-
-        .status-badge{
-          position:absolute;
-          right:14px;
-          top:14px;
-          padding:6px 11px;
-          border-radius:20px;
-          font-size:9px;
-          font-weight:700;
-        }
-
-        .published{
-          background:#EAF4FF;
-          color:var(--navy);
-        }
-
-        .draft{
-          background:var(--light-red);
-          color:var(--red);
-        }
-
-        .blog-title{
-          color:var(--dark);
-          font-size:17px;
-          font-weight:800;
-          line-height:1.4;
-        }
-
-        .blog-description{
-          color:var(--muted);
-          font-size:11px;
-          line-height:1.7;
-          min-height:58px;
-        }
-
-        .blog-info{
-          display:flex;
-          gap:15px;
-          flex-wrap:wrap;
-          padding:12px 0;
-          margin:10px 0;
-          border-block:1px solid #F0F2F5;
-        }
-
-        .blog-info span{
-          color:var(--muted);
-          font-size:9px;
-        }
-
-        .blog-info svg{
-          color:var(--red);
-          margin-right:4px;
-        }
-
-        .action-btn{
-          font-size:10px;
-          font-weight:700;
-          border-radius:7px;
-          padding:7px 10px;
-        }
-
-        .view-btn{
-          background:var(--light-navy);
-          color:var(--navy);
-          border:0;
-        }
-
-        .edit-btn{
-          flex:1;
-          background:white;
-          color:var(--navy);
-          border:1px solid #CBD5E1;
-        }
-
-        .delete-btn{
-          background:var(--light-red);
-          color:var(--red);
-          border:0;
-        }
-
-        .modal-label{
-          color:var(--dark);
-          font-size:11px;
-          font-weight:700;
-        }
-
-        .modal-control{
-          font-size:12px;
-          box-shadow:none!important;
-        }
-
-        @media(max-width:768px){
-          .blog-page{
-            padding:15px;
-          }
-
-          .blog-hero{
-            padding:24px;
-          }
-
-          .blog-hero h1{
-            font-size:25px;
-          }
-
-          .blog-hero button{
-            width:100%;
-            margin-top:18px;
-          }
-        }
-      `}</style>
-
+    <AdminLayout>
       <div className="blog-page">
         <Container fluid>
-
-          {/* HEADER */}
-
-          <div className="blog-hero">
+          {/* HERO BANNER MATCHED TO DESIGN */}
+          <div className="custom-hero-banner mb-4">
             <Row className="align-items-center">
               <Col lg={8}>
-                <div className="hero-label">
-                  ADMINISTRATION / BLOG MANAGEMENT
-                </div>
-
-                <h1>Manage Your Stories</h1>
-
-                <p>
-                  Create, publish and manage foundation stories,
-                  news and community updates.
+                <div className="hero-sublabel">ADMINISTRATION / BLOG MANAGEMENT</div>
+                <h1 className="hero-title">Manage Your Stories</h1>
+                <p className="hero-desc">
+                  Create, publish, and manage foundation stories, news, and community updates from one unified table view.
                 </p>
               </Col>
-
-              <Col lg={4} className="text-lg-end">
-                <Button className="primary-btn" onClick={openAdd}>
-                  <FaPlus className="me-2" />
-                  Add New Blog
+              <Col lg={4} className="text-lg-end mt-3 mt-lg-0">
+                <Button className="hero-add-btn" onClick={openAdd}>
+                  <FaPlus className="me-2" /> Add New Blog
                 </Button>
               </Col>
             </Row>
           </div>
 
-          {/* STATS */}
-
-          <Row className="g-3">
-            {stats.map(([Icon, number, label, color]) => (
-              <Col xs={6} lg={3} key={label}>
-                <Card className="stat-card">
-                  <Card.Body className="d-flex align-items-center gap-3">
-                    <div className={`stat-icon ${color}-icon`}>
-                      <Icon />
-                    </div>
-
-                    <div>
-                      <div className="stat-number">{number}</div>
-                      <div className="stat-label">{label}</div>
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-
-          <h2 className="section-title">All Blog Posts</h2>
-
-          <p className="stat-label">
+          <h2 className="section-title mt-4">All Blog Posts</h2>
+          <p className="stat-label mb-3">
             Manage your foundation's stories and updates.
           </p>
 
           {/* FILTERS */}
-
           <div className="filter-box">
             <Row className="g-2">
-              <Col lg={5}>
+              <Col lg={6}>
                 <InputGroup>
                   <InputGroup.Text>
                     <FaSearch />
                   </InputGroup.Text>
-
                   <Form.Control
                     className="filter-control"
                     placeholder="Search blogs..."
@@ -537,12 +203,11 @@ const Blog = () => {
                 </InputGroup>
               </Col>
 
-              <Col sm={6} lg={3}>
+              <Col lg={6}>
                 <InputGroup>
                   <InputGroup.Text>
                     <FaFilter />
                   </InputGroup.Text>
-
                   <Form.Select
                     className="filter-control"
                     value={category}
@@ -555,128 +220,81 @@ const Blog = () => {
                   </Form.Select>
                 </InputGroup>
               </Col>
-
-              <Col sm={6} lg={3}>
-                <Form.Select
-                  className="filter-control"
-                  value={status}
-                  onChange={e => setStatus(e.target.value)}
-                >
-                  <option value="All">All Status</option>
-                  <option value="Published">Published</option>
-                  <option value="Draft">Draft</option>
-                </Form.Select>
-              </Col>
             </Row>
           </div>
 
-          {/* BLOG CARDS */}
-
-          <Row className="g-4">
-            {filteredBlogs.length ? (
-              filteredBlogs.map(blog => (
-                <Col xs={12} sm={6} xl={4} key={blog.id}>
-                  <Card className="blog-card">
-
-                    <div className="blog-image">
-                      <img src={blog.image} alt={blog.title} />
-
-                      <span className="category-badge">
-                        {blog.category}
-                      </span>
-
-                      <span
-                        className={`status-badge ${
-                          blog.status === "Published"
-                            ? "published"
-                            : "draft"
-                        }`}
-                      >
-                        {blog.status}
-                      </span>
-                    </div>
-
-                    <Card.Body>
-                      <h3 className="blog-title">
-                        {blog.title}
-                      </h3>
-
-                      <p className="blog-description">
-                        {blog.description}
-                      </p>
-
-                      <div className="blog-info">
-                        <span>
-                          <FaUser />
-                          {blog.author}
-                        </span>
-
-                        <span>
-                          <FaCalendarAlt />
-                          {blog.date}
-                        </span>
-                      </div>
-
-                      <div className="d-flex gap-2">
-                        <Button
-                          className="action-btn view-btn"
-                          onClick={() => {
+          {/* TABLE */}
+          <div className="table-wrapper no-scroll-wrapper">
+            <Table hover className="custom-blog-table fit-table mb-0 align-middle">
+              <thead>
+                <tr>
+                  <th style={{ width: "50px" }}>Sr.</th>
+                  <th style={{ width: "40%" }}>Blog Details</th>
+                  <th style={{ width: "20%" }}>Category</th>
+                  <th style={{ width: "80px" }}>Image</th>
+                  <th style={{ width: "15%" }}>Date</th>
+                  <th style={{ width: "120px" }} className="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredBlogs.length ? (
+                  filteredBlogs.map((blog, index) => (
+                    <tr key={blog.id}>
+                      <td className="fw-bold text-muted">{index + 1}</td>
+                      <td>
+                        <div className="text-truncate-container">
+                          <div className="blog-table-title text-truncate">{blog.title}</div>
+                          <div className="blog-table-desc text-truncate">{blog.description}</div>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="category-badge-pill">{blog.category}</span>
+                      </td>
+                      <td>
+                        <img src={blog.image} alt={blog.title} className="blog-img-thumb" />
+                      </td>
+                      <td>
+                        <span className="text-nowrap"><FaCalendarAlt className="me-1 text-danger" />{blog.date}</span>
+                      </td>
+                      <td>
+                        <div className="actions justify-content-end">
+                          <button className="action-btn" title="View" onClick={() => {
                             setSelected(blog);
                             setModal("view");
-                          }}
-                        >
-                          <FaEye />
-                        </Button>
+                          }}>
+                            <FaEye />
+                          </button>
 
-                        <Button
-                          className="action-btn edit-btn"
-                          onClick={() => openEdit(blog)}
-                        >
-                          <FaEdit /> Update
-                        </Button>
+                          <button className="action-btn" title="Edit" onClick={() => openEdit(blog)}>
+                            <FaEdit />
+                          </button>
 
-                        <Button
-                          className="action-btn delete-btn"
-                          onClick={() => {
+                          <button className="action-btn delete-btn" title="Delete" onClick={() => {
                             setSelected(blog);
                             setModal("delete");
-                          }}
-                        >
-                          <FaTrash />
-                        </Button>
-                      </div>
-                    </Card.Body>
-
-                  </Card>
-                </Col>
-              ))
-            ) : (
-              <Col>
-                <div className="text-center p-5">
-                  <FaBlog
-                    style={{
-                      fontSize: 40,
-                      color: "var(--muted)"
-                    }}
-                  />
-
-                  <h5 className="mt-3">
-                    No blogs found
-                  </h5>
-
-                  <p className="stat-label">
-                    Try changing your search or filters.
-                  </p>
-                </div>
-              </Col>
-            )}
-          </Row>
-
+                          }}>
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="text-center py-5">
+                      <FaBlog style={{ fontSize: 35, color: "var(--muted)" }} />
+                      <h6 className="mt-3 text-dark font-weight-bold">No blogs found</h6>
+                      <p className="stat-label mb-0">Try changing your search or filters.</p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </div>
         </Container>
       </div>
 
       {/* ADD / UPDATE MODAL */}
-
       <Modal
         show={modal === "add" || modal === "edit"}
         onHide={() => setModal("")}
@@ -684,23 +302,16 @@ const Blog = () => {
         size="lg"
       >
         <Form onSubmit={saveBlog}>
-
           <Modal.Header closeButton>
             <Modal.Title className="modal-title">
-              {modal === "add"
-                ? "Create New Blog"
-                : "Update Blog"}
+              {modal === "add" ? "Create New Blog" : "Update Blog"}
             </Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
             <Row className="g-3">
-
               <Col md={8}>
-                <Form.Label className="modal-label">
-                  Blog Title
-                </Form.Label>
-
+                <Form.Label className="modal-label">Blog Title</Form.Label>
                 <Form.Control
                   className="modal-control"
                   name="title"
@@ -712,10 +323,7 @@ const Blog = () => {
               </Col>
 
               <Col md={4}>
-                <Form.Label className="modal-label">
-                  Category
-                </Form.Label>
-
+                <Form.Label className="modal-label">Category</Form.Label>
                 <Form.Select
                   className="modal-control"
                   name="category"
@@ -728,24 +336,8 @@ const Blog = () => {
                 </Form.Select>
               </Col>
 
-              <Col md={6}>
-                <Form.Label className="modal-label">
-                  Author
-                </Form.Label>
-
-                <Form.Control
-                  className="modal-control"
-                  name="author"
-                  value={form.author}
-                  onChange={updateForm}
-                />
-              </Col>
-
-              <Col md={6}>
-                <Form.Label className="modal-label">
-                  Publish Date
-                </Form.Label>
-
+              <Col md={12}>
+                <Form.Label className="modal-label">Publish Date</Form.Label>
                 <Form.Control
                   className="modal-control"
                   name="date"
@@ -756,24 +348,26 @@ const Blog = () => {
               </Col>
 
               <Col xs={12}>
-                <Form.Label className="modal-label">
-                  Featured Image URL
-                </Form.Label>
-
+                <Form.Label className="modal-label">Upload Blog Image</Form.Label>
                 <Form.Control
+                  type="file"
+                  accept="image/*"
                   className="modal-control"
-                  name="image"
-                  value={form.image}
-                  onChange={updateForm}
-                  placeholder="Paste image URL"
+                  onChange={handleImageUpload}
                 />
+                {form.image && (
+                  <div className="mt-2">
+                    <img 
+                      src={form.image} 
+                      alt="Preview" 
+                      style={{ width: "80px", height: "60px", objectFit: "cover", borderRadius: "6px" }} 
+                    />
+                  </div>
+                )}
               </Col>
 
               <Col xs={12}>
-                <Form.Label className="modal-label">
-                  Short Description
-                </Form.Label>
-
+                <Form.Label className="modal-label">Short Description</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={2}
@@ -787,10 +381,7 @@ const Blog = () => {
               </Col>
 
               <Col xs={12}>
-                <Form.Label className="modal-label">
-                  Blog Content
-                </Form.Label>
-
+                <Form.Label className="modal-label">Blog Content</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={6}
@@ -812,33 +403,21 @@ const Blog = () => {
                   label="Publish this blog on the website"
                 />
               </Col>
-
             </Row>
           </Modal.Body>
 
           <Modal.Footer>
-            <Button
-              variant="light"
-              onClick={() => setModal("")}
-            >
+            <Button variant="light" onClick={() => setModal("")}>
               Cancel
             </Button>
-
-            <Button
-              className="primary-btn"
-              type="submit"
-            >
-              {modal === "add"
-                ? <><FaPlus /> Add Blog</>
-                : <><FaEdit /> Save Changes</>}
+            <Button variant="danger" className="btn-red-action" type="submit">
+              {modal === "add" ? <><FaPlus className="me-1" /> Add Blog</> : <><FaEdit className="me-1" /> Save Changes</>}
             </Button>
           </Modal.Footer>
-
         </Form>
       </Modal>
 
       {/* VIEW MODAL */}
-
       <Modal
         show={modal === "view"}
         onHide={() => setModal("")}
@@ -848,13 +427,10 @@ const Blog = () => {
         {selected && (
           <>
             <Modal.Header closeButton>
-              <Modal.Title>
-                Blog Preview
-              </Modal.Title>
+              <Modal.Title>Blog Preview</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
-
               <img
                 src={selected.image}
                 alt={selected.title}
@@ -866,133 +442,71 @@ const Blog = () => {
                 }}
               />
 
-              <Badge
-                className="mt-3"
-                style={{
-                  background: "var(--light-red)",
-                  color: "var(--red)"
-                }}
-              >
-                {selected.category}
-              </Badge>
+              <div className="mt-3">
+                <span className="category-badge-pill">{selected.category}</span>
+              </div>
 
-              <h2
-                className="mt-3"
-                style={{
-                  color: "var(--dark)",
-                  fontWeight: 800
-                }}
-              >
+              <h2 className="mt-3 text-dark fw-bold">
                 {selected.title}
               </h2>
 
-              <div className="blog-info">
-                <span>
-                  <FaUser /> {selected.author}
-                </span>
-
-                <span>
-                  <FaCalendarAlt /> {selected.date}
-                </span>
-
-                <span>
-                  <FaGlobe /> {selected.status}
-                </span>
+              <div className="blog-info border-top border-bottom py-2 my-3 text-muted" style={{ fontSize: 13 }}>
+                <span><FaCalendarAlt className="text-danger me-1" /> {selected.date}</span>
               </div>
 
-              <p className="blog-description">
+              <p className="blog-description fw-semibold">
                 {selected.description}
               </p>
 
-              <p
-                style={{
-                  color: "var(--text)",
-                  fontSize: 13,
-                  lineHeight: 1.8
-                }}
-              >
+              <p style={{ color: "#334155", fontSize: 14, lineHeight: 1.8 }}>
                 {selected.content}
               </p>
-
             </Modal.Body>
 
             <Modal.Footer>
-
-              <Button
-                variant="light"
-                onClick={() => setModal("")}
-              >
+              <Button variant="light" onClick={() => setModal("")}>
                 Close
               </Button>
-
-              <Button
-                className="primary-btn"
-                onClick={() => openEdit(selected)}
-              >
-                <FaEdit /> Update
+              <Button variant="danger" className="btn-red-action" onClick={() => openEdit(selected)}>
+                <FaEdit className="me-1" /> Update
               </Button>
-
             </Modal.Footer>
           </>
         )}
       </Modal>
 
       {/* DELETE MODAL */}
-
       <Modal
         show={modal === "delete"}
         onHide={() => setModal("")}
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title>
-            Delete Blog
-          </Modal.Title>
+          <Modal.Title>Delete Blog</Modal.Title>
         </Modal.Header>
 
         <Modal.Body className="text-center p-4">
-
-          <FaTrash
-            style={{
-              fontSize: 35,
-              color: "var(--red)"
-            }}
-          />
-
-          <h5 className="mt-3">
-            Delete this blog?
-          </h5>
-
+          <FaTrash style={{ fontSize: 35, color: "#dc3545" }} />
+          <h5 className="mt-3">Delete this blog?</h5>
           <p className="stat-label">
-            Are you sure you want to delete{" "}
-            <b>{selected?.title}</b>?
-            This action cannot be undone.
+            Are you sure you want to delete <b>{selected?.title}</b>? This action cannot be undone.
           </p>
-
         </Modal.Body>
 
         <Modal.Footer>
-
-          <Button
-            variant="light"
-            onClick={() => setModal("")}
-          >
+          <Button variant="light" onClick={() => setModal("")}>
             Cancel
           </Button>
-
           <Button
-            style={{
-              background: "var(--red)",
-              border: 0
-            }}
+            variant="danger"
+            className="btn-red-action"
             onClick={deleteBlog}
           >
-            <FaTrash /> Delete
+            <FaTrash className="me-1" /> Delete
           </Button>
-
         </Modal.Footer>
       </Modal>
-    </>
+    </AdminLayout>
   );
 };
 

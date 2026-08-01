@@ -694,19 +694,19 @@ body{
 /* Different Colors */
 
 .action-blue {
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  background: linear-gradient(135deg, #162c5e, #5560bf);
 }
 
 .action-green {
-  background: linear-gradient(135deg, #10b981, #34d399);
+  background: linear-gradient(135deg, #162c5e, #5560bf);
 }
 
 .action-orange {
-  background: linear-gradient(135deg, #f97316, #fb923c);
+  background: linear-gradient(135deg, #162c5e, #5560bf);
 }
 
 .action-purple {
-  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  background: linear-gradient(135deg, #162c5e, #5560bf);
 }
 
 /* Responsive */

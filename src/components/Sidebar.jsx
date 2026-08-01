@@ -47,11 +47,7 @@ function Sidebar({ collapsed, setCollapsed }) {
       icon: <FaEnvelopeOpenText />,
       label: "Contact",
     },
-    {
-      path: "/settings",
-      icon: <FaCog />,
-      label: "Settings",
-    },
+    
   ];
 
   return (
@@ -278,19 +274,7 @@ function Sidebar({ collapsed, setCollapsed }) {
             </NavLink>
           ))}
 
-          {/* Logout */}
-          <NavLink
-            to="/login"
-            className={`sidebar-link sidebar-logout ${
-              collapsed ? "collapsed-link" : ""
-            }`}
-          >
-            <FaSignOutAlt />
-
-            {!collapsed && (
-              <span>Logout</span>
-            )}
-          </NavLink>
+         
 
         </nav>
 
